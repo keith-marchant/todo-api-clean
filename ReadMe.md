@@ -1,6 +1,6 @@
 # TodoApi Clean
 
-[BUILD](https://github.com/keith-marchant/todo-api-clean/actions/workflows/build.yml/badge.svg)
+![BUILD](https://github.com/keith-marchant/todo-api-clean/actions/workflows/build.yml/badge.svg)
 
 ## Summary
 
