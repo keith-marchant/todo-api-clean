@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using TodoApp.Application.Pagination;
+using Microsoft.AspNetCore.WebUtilities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TodoApp.Api.Controllers
 {
@@ -41,44 +43,38 @@ namespace TodoApp.Api.Controllers
                 throw new ArgumentNullException(nameof(result));
             }
 
-            var links = new Links(new Uri(UrlHelper.Action(actionName, query) ?? HttpContext.Request.GetEncodedUrl()));
+            var routeLink = UrlHelper.Action(actionName) ?? "";
+
+            var links = new Links(GetLink(routeLink, query.Offset, query.Limit));
 
             // next
             if (query.Offset + query.Limit < result.Total)
             {
-                query.Offset += query.Limit;
+                var offset = query.Offset + query.Limit;
 
-                var next = UrlHelper.Action(actionName, query);
-                
-                if (!string.IsNullOrEmpty(next))
-                {
-                    links.Next = new Uri(next);
-                }
-
-                query.Offset -= query.Limit;
+                links.Next = GetLink(routeLink, offset, query.Limit);
             }
 
             // previous
             if (query.Offset > 0)
             {
-                if (query.Offset <= query.Limit)
-                {
-                    query.Offset = 0;
-                }
-                else
-                {
-                    query.Offset -= query.Limit;
-                }
+                var offset = query.Offset <= query.Limit ? 0 : query.Offset - query.Limit;
 
-                var previous = UrlHelper.Action(actionName, query);
-
-                if (!string.IsNullOrEmpty(previous))
-                {
-                    links.Previous = new Uri(previous);
-                }
+                links.Previous = GetLink(routeLink, offset, query.Limit);
             }
 
             return links;
+        }
+
+        private static string GetLink(string url, int offset, int limit)
+        {
+            var queryMap = new Dictionary<string, string?>
+            {
+                    { "offset", offset.ToString() },
+                    { "limit", limit.ToString() }
+                };
+
+            return QueryHelpers.AddQueryString(url, queryMap);
         }
     }
 }

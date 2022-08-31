@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Items\Commands\" />
-    <Folder Include="Items\Queries\" />
+    <Folder Include="Items\Queries\GetItemsById\" />
   </ItemGroup>
 
 </Project>

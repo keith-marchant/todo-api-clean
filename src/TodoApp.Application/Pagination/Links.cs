@@ -9,7 +9,7 @@
         /// Create a new <see cref="Links"/> object.
         /// </summary>
         /// <param name="self">The current URL.</param>
-        public Links(Uri self)
+        public Links(string self)
         {
             Self = self;
         }
@@ -17,14 +17,14 @@
         /// <summary>
         /// Gets a URI link to the current page.
         /// </summary>
-        public Uri Self { get; }
+        public string Self { get; }
         /// <summary>
         /// Gets a URI link to the next page.
         /// </summary>
-        public Uri? Next { get; set; }
+        public string? Next { get; set; }
         /// <summary>
         /// Gets a URI link to the previous page.
         /// </summary>
-        public Uri? Previous { get; set; }
+        public string? Previous { get; set; }
     }
 }
