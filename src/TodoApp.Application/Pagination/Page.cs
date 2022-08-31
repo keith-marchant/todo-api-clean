@@ -1,5 +1,9 @@
 ﻿namespace TodoApp.Application.Pagination
 {
+    /// <summary>
+    /// Internal class to transfer paginated query results.
+    /// </summary>
+    /// <typeparam name="T">The type of the query results.</typeparam>
     public class Page<T>
     {
         /// <summary>
