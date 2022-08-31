@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Items\Commands\" />
+    <Folder Include="Items\Commands\UpdateItem\" />
   </ItemGroup>
 
 </Project>
