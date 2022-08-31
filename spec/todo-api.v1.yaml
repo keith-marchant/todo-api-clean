@@ -1,0 +1,341 @@
+openapi: 3.0.3
+info:
+  title: Todo API
+  description: |
+    The Todo API provides mechanisms for managing todo items.
+  version: v1
+servers:
+  - url: https://localhost:44335
+tags:
+  - name: TodoItem
+    description: Provides access to functionality for creating and administering todo items.
+paths:
+  /items:
+    get:
+      summary: Get all todo items
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/status'
+      tags:
+        - todoItems
+      operationId: get-todoItems
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoListResponse'
+        '500':
+          $ref: '#/components/responses/serverError'
+    post:
+      summary: Create a new todo item
+      tags:
+        - todoItems
+      operationId: post-todoItems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              title: itemCreationRequest
+              description: The request to create a new todo item
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                description:
+                  type: string
+                dueDate:
+                  type: string
+                  format: date-time
+              required:
+                - title
+            example:
+              title: Pay bills
+              description: Sydney Water
+              dueDate: '2022-09-14T09:00:00Z'
+      responses:
+        '201':
+          description: Created
+          headers:
+            location:
+              description: Uri describing the todo item GET resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '500':
+          $ref: '#/components/responses/serverError'
+
+  /items/{itemId}:
+    get:
+      summary: Retrieve a todo item
+      tags:
+        - todoItems
+      operationId: get-todoItems-itemId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/serverError'
+    put:
+      summary: Update todo item
+      tags:
+        - todoItems
+      operationId: put-todoItems-itemId
+      description: |
+        Update the description, status, or due date of a todo item. The title cannot be updated because _business rules_.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: updateTodoItemRequest
+              type: object
+              description: |
+                Update model for a todo item
+              properties:
+                description:
+                  type: string
+                dueDate:
+                  type: string
+                  format: date-time
+                status:
+                  $ref: '#/components/schemas/todoItemStatus'
+              required:
+                - description
+                - dueDate
+                - status
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/serverError'
+
+components:
+  parameters:
+    limit:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        default: 100
+        minimum: 1
+      description: The maximum number of results to return over when a paginated result is returned.
+    offset:
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+      description: The number of results to skip over when a paginated result is returned.
+    status:
+      in: query
+      name: status
+      required: false
+      schema:
+        $ref: '#/components/schemas/todoItemStatus'
+      description: The status to filter by (leave empty for all).
+
+  schemas:
+    error:
+      type: object
+      properties:
+        status:
+          type: integer
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        type:
+          type: string
+      required:
+        - status
+        - title
+        - type
+    todoItemStatus:
+      title: todoItem Status
+      type: string
+      enum: [
+        Incomplete,
+        Complete,
+        Deleted
+      ]
+      example: Complete
+    todoListResponse:
+      title: todoListResponse
+      type: object
+      description: The response model when searching for todo items.
+      properties:
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: uri
+            next:
+              type: string
+              format: uri
+            previous:
+              type: string
+              format: uri
+        total:
+          type: integer
+        results:
+          type: array
+          items:            
+            $ref: '#/components/schemas/todoItem'
+    todoItem:
+      title: todoItem
+      type: object
+      description: |
+        The representation of a todo item.
+      properties:
+        itemId:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/todoItemStatus'
+      example:
+        itemId: 1
+        title: Pay bills
+        description: Sydney Water
+        dueDate: '2022-09-14T09:00:00Z'
+        status: Incomplete
+
+  responses:
+    badRequest:
+      description: Validation of request failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/400
+            status: 400
+            title: Bad Request
+            detail: Body must be present and contain field xyz
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    authError:
+      description: Authorization information is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/401
+            status: 401
+            title: Unauthorized
+            detail: Bearer token missing or invalid
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    forbidden:
+      description: The server understood the request but refuses to authorize it.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/403
+            status: 403
+            title: Forbidden
+            detail: Resource xyz is forbidden
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    notFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/404
+            status: 404
+            title: Not Found
+            detail: Identifier xyz could not be found
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    conflict:
+      description: A conflict was found with the current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/409
+            status: 409
+            title: Conflict
+            detail: You are attempting to update or create an old version of resource x
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    gone:
+      description: Requested resource is no longer available.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/410
+            status: 410
+            title: Gone
+            detail: Identifier xyz is no longer available
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    unprocessableEntity:
+      description: The server was unable or unwilling to process the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/422
+            status: 422
+            title: Unprocessable Entity
+            detail: Cannot update the abc of an order becauase xyz
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    serverError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            timestamp: 2022-08-31T13:14:15.000Z
+            type: https://httpstatuses.com/500
+            status: 500
+            title: Internal Server Error
+            detail: Something went wrong
+            instance: 3fa85f64-5717-4562-b3fc-2c963f66afa6
