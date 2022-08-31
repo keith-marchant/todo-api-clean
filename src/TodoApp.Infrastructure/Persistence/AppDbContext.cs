@@ -9,7 +9,7 @@ namespace TodoApp.Infrastructure.Persistence
         public AppDbContext(DbContextOptions options) : base(options)
         { }
 
-        public DbSet<TodoItem>? TodoItems { get; set; }
+        public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
