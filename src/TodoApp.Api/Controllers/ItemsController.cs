@@ -2,6 +2,7 @@
 using TodoApp.Api.ProblemDetails;
 using TodoApp.Application.Enums;
 using TodoApp.Application.Items.Commands.CreateItem;
+using TodoApp.Application.Items.Commands.UpdateItem;
 using TodoApp.Application.Items.Dtos;
 using TodoApp.Application.Items.Queries.GetItemById;
 using TodoApp.Application.Items.Queries.GetItems;
@@ -56,6 +57,19 @@ namespace TodoApp.Api.Controllers
         {
             var result = await Mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { itemId = result.ItemId }, result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BadRequestProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(NotFoundProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UnhandledExceptionProblemDetails), StatusCodes.Status500InternalServerError)]
+        [HttpPut("{itemId}")]
+        public async Task<IActionResult> Update([FromRoute] int itemId, [FromBody] UpdateItemCommand command, CancellationToken cancellationToken)
+        {
+            command.ItemId = itemId;
+
+            await Mediator.Send(command, cancellationToken);
+            return NoContent();
         }
     }
 }

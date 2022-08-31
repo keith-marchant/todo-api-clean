@@ -22,7 +22,7 @@ namespace TodoApp.Infrastructure
             else
             {
                 services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+                options.UseInMemoryDatabase("TodoDb"));
             }
 
             return services;
