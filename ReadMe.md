@@ -4,19 +4,20 @@
 
 - [TodoApi Clean](#todoapi-clean)
   - [Summary](#summary)
-    - [Specification](#specification)
-      - [Specification Tooling](#specification-tooling)
-      - [Specification Mocking](#specification-mocking)
+  - [Specification](#specification)
+    - [Specification Tooling](#specification-tooling)
+    - [Specification Mocking](#specification-mocking)
+  - [Architecture](#architecture)
 
 ## Summary
 
 TodoApi Clean is a basic todo API written using the [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) framework with [Mediatr](https://github.com/jbogard/MediatR) handling communication between layers.
 
-### Specification
+## Specification
 
 The specification is written using [OpenAPI](https://swagger.io/specification/) and may be accessed [here](./spec/todo-api.v1.yaml).
 
-#### Specification Tooling
+### Specification Tooling
 
 I use VS Code to edit the OpenAPI YAML along with the following extensions to help navigate and render it:
 - [OpenAPI Swagger Editor](https://github.com/42Crunch/vscode-openapi)
@@ -24,7 +25,7 @@ I use VS Code to edit the OpenAPI YAML along with the following extensions to he
 
 Builds can be done by running: `redoc-cli bundle .\todo-api.v1.yaml` which will generate a redoc static html file. 
 
-#### Specification Mocking
+### Specification Mocking
 
 When building an API it can be helpful to mock the spec for the purposes of front end development, test suite generation, and demonstration purposes. To mock this spec I recommend [Prism](https://meta.stoplight.io/docs/prism/ZG9jOjky-installation)
 
@@ -36,4 +37,6 @@ curl --request GET \
 ```
 
 Prism will display a log of all requests and will pull responses from the examples loaded into the specification.
+
+## Architecture
 
