@@ -8,6 +8,8 @@
     - [Specification Tooling](#specification-tooling)
     - [Specification Mocking](#specification-mocking)
   - [Architecture](#architecture)
+  - [Deployment](#deployment)
+    - [Deploying as an Azure App Service](#deploying-as-an-azure-app-service)
 
 ## Summary
 
@@ -40,3 +42,43 @@ Prism will display a log of all requests and will pull responses from the exampl
 
 ## Architecture
 
+## Deployment
+
+### Deploying as an Azure App Service
+
+*Note: This is for demo purposes only, if you want to deploy repeatedly set up a deploy pipeline using GitHub Actions*
+
+1. Create the resource group
+
+```PowerShell
+az group create --name myResourceGroup --location AustraliaEast
+```
+
+2. Create the App Service Plan
+
+```PowerShell
+az appservice plan create --name myAppServicePlan --resource-group myResourceGroup --sku B1
+```
+
+3. Create an App Service App
+
+```PowerShell
+az webapp create --resource-group myResourceGroup --plan myAppServicePlan --name myAppName
+```
+
+4. Compress the app output directory
+
+```PowerShell
+dotnet build
+cd .\src\TodoApp.Api
+dotnet publish
+cd .\bin\Debug\net6.0\publish
+Compress-Archive -Path * -DestinationPath .\publishArchive.zip
+az webapp deploy --resource-group myResourceGroup --name myAppName --src-path .\publishArchive.zip 
+```
+
+5. To clean up resources
+
+```PowerShell
+az group delete --name myResourceGroup --no-wait
+```
