@@ -15,6 +15,13 @@ namespace TodoApp.Api.Controllers
     /// </summary>
     public class ItemsController : ApiController
     {
+        private readonly ILogger<ItemsController> _logger;
+
+        public ItemsController(ILogger<ItemsController> logger)
+        {
+            _logger = logger;
+        }
+
         /// <summary>
         /// Search for a <see cref="TodoItemDto"/>.
         /// </summary>
@@ -32,6 +39,8 @@ namespace TodoApp.Api.Controllers
             [FromQuery]int? offset,
             CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Get All Items");
+
             var query = new GetItemsQuery(status, limit, offset);
 
             var result = await Mediator.Send(query, cancellationToken);
@@ -46,6 +55,8 @@ namespace TodoApp.Api.Controllers
         [HttpGet("{itemId}")]
         public async Task<ActionResult<TodoItemDto>> GetById([FromRoute]int itemId, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Get Item {ItemId}", itemId);
+
             return Ok(await Mediator.Send(new GetItemByIdQuery(itemId), cancellationToken));
         }
 
@@ -55,6 +66,8 @@ namespace TodoApp.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItemDto>> Create([FromBody] CreateItemCommand command, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Create an Item");
+
             var result = await Mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { itemId = result.ItemId }, result);
         }
@@ -66,6 +79,8 @@ namespace TodoApp.Api.Controllers
         [HttpPut("{itemId}")]
         public async Task<IActionResult> Update([FromRoute] int itemId, [FromBody] UpdateItemCommand command, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Update Item {ItemId}", itemId);
+
             command.ItemId = itemId;
 
             await Mediator.Send(command, cancellationToken);
