@@ -5,7 +5,7 @@ info:
     The Todo API provides mechanisms for managing todo items.
   version: v1
 servers:
-  - url: https://localhost:44335
+  - url: https://localhost:4010
 tags:
   - name: TodoItem
     description: Provides access to functionality for creating and administering todo items.
@@ -46,11 +46,17 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 100
+                  x-faker:
+                    random.alpha:
+                      count: 25
                 description:
                   type: string
+                  x-faker: lorem.sentence
                 dueDate:
                   type: string
                   format: date-time
+                  x-faker:
+                    date.future
               required:
                 - title
             example:
@@ -110,9 +116,11 @@ paths:
               properties:
                 description:
                   type: string
+                  x-faker: lorem.sentence
                 dueDate:
                   type: string
                   format: date-time
+                  x-faker: date.future
                 status:
                   $ref: '#/components/schemas/todoItemStatus'
               required:
@@ -139,6 +147,7 @@ components:
         type: integer
         default: 100
         minimum: 1
+        example: 100
       description: The maximum number of results to return over when a paginated result is returned.
     offset:
       in: query
@@ -148,6 +157,7 @@ components:
         type: integer
         default: 0
         minimum: 0
+        example: 0
       description: The number of results to skip over when a paginated result is returned.
     status:
       in: query
@@ -195,14 +205,22 @@ components:
             self:
               type: string
               format: uri
+              example: https://localhost:4010/items?limit=100&offset=0
             next:
               type: string
               format: uri
+              example: https://localhost:4010/items?limit=100&offset=100
             previous:
               type: string
               format: uri
+              example: null
         total:
           type: integer
+          example: 125
+          x-faker:
+            datatype.number:
+              min: 0
+              max: 200
         results:
           type: array
           items:            
@@ -216,15 +234,24 @@ components:
         itemId:
           type: integer
           minimum: 1
+          x-faker:
+            datatype.number:
+              min: 1
+              max: 255
         title:
           type: string
           minLength: 1
           maxLength: 100
+          x-faker:
+            random.alpha:
+              count: 25
         description:
           type: string
+          x-faker: lorem.sentence
         dueDate:
           type: string
           format: date-time
+          x-faker: date.future
         status:
           $ref: '#/components/schemas/todoItemStatus'
       example:
